@@ -1,0 +1,70 @@
+
+  
+1. Determine the number of times a particular channel was used in the web_events table for each region Your final table should have three columns – the region name, the channel and the number of occurrences. Order your table with the highest number of occurrences first.
+
+SELECT   r.name AS Region_Name , w.channel, COUNT(w.channel) AS Num_Occurence
+FROM web_events w 
+JOIN accounts a 
+ON a.id = w.account_id
+JOIN sales_reps s
+ON s.id = a.sales_rep_id
+JOIN region r 
+ON r.id = s.region_id
+GROUP BY w.channel, r.name
+ORDER BY COUNT(w.channel) DESC;
+
+2.	How many accounts have more than 20 orders?
+
+SELECT a.name as Name, COUNT(*) AS Num_Accounts
+FROM accounts a 
+JOIN orders o 
+ON a.id = o.account_id
+GROUP BY  a.name
+HAVING COUNT(*)>20
+ORDER BY a.name ASC;
+
+3. Which accounts spent more than 30,000 usd total across all orders?
+
+SELECT a.name AS Account_Name, SUM(total_amt_usd) AS Total_Amount
+FROM accounts a 
+JOIN orders o 
+ON a.id = o.account_id
+GROUP BY  a.name
+HAVING SUM( total_amt_usd)> 30000
+ORDER BY SUM( total_amt_usd) DESC;
+
+4. 	Which accounts used facebook as a channel to contact customers more    than 6 times?
+
+SELECT   a.name, w.channel, COUNT(w.channel) AS Num_Occurence
+FROM web_events w 
+JOIN accounts a 
+ON a.id = w.account_id
+GROUP BY w.channel, a.name
+HAVING channel = 'facebook' AND COUNT(w.channel) >6
+ORDER BY COUNT(w.channel) DESC;
+
+5.	Which account has the most orders?
+
+SELECT a.name AS Account_Name, SUM(o.Total) AS Max_Value
+from accounts a
+JOIN orders o
+ON o.account_id = a.id
+GROUP BY a.name
+HAVING SUM(o.Total) = (SELECT  MAX(Total_Orders) AS Maximum_orders
+ FROM (SELECT a.name, sum(o.Total) as Total_Orders
+from accounts a 
+JOIN orders o 
+ON o.account_id = a.id
+GROUP BY a.name) T1);
+
+6. How many accounts spent more than 30,000 USD across all orders?
+
+SELECT count(*) AS Total_Number_Of_Accounts
+FROM  (SELECT a.name AS Account_Name, SUM(total_amt_usd) AS Total_Amount
+      FROM accounts a 
+      JOIN orders o 
+      ON a.id = o.account_id
+      GROUP BY  a.name
+      HAVING SUM( total_amt_usd)> 30000) T1;
+
+
